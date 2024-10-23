@@ -1,0 +1,85 @@
+--Create a plsql package and procedure, that retrive department_id, department_name and
+--location_id of all departments that located in country_id for us using the cursor with basic loop.
+CREATE OR REPLACE PACKAGE dept_package AS
+    PROCEDURE get_department_by_country (
+        p_country_id IN VARCHAR
+    );
+
+END dept_package;
+/
+
+CREATE OR REPLACE PACKAGE BODY dept_package AS
+
+    PROCEDURE get_department_by_country (
+        p_country_id IN VARCHAR
+    ) IS
+        v_row_count NUMBER := 0;
+    BEGIN 
+    -- Implicit cursor to fetch data from database 
+        FOR dept_record IN (
+            SELECT
+                d.department_id,
+                d.department_name,
+                d.location_id,
+                c.country_id
+            FROM
+                     departments d
+                JOIN locations l ON d.location_id = l.location_id
+                JOIN countries c ON l.country_id = c.country_id
+            WHERE
+                c.country_id = p_country_id
+        ) LOOP
+            dbms_output.put_line('Department ID: '
+                                 || dept_record.department_id
+                                 || ', Department Name: '
+                                 || dept_record.department_name
+                                 || ',location :'
+                                 || dept_record.location_id
+                                 || dept_record.country_id);
+        END LOOP;
+        --implicit exception 
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went worng' || sqlerrm);
+    END get_department_by_country;
+
+END dept_package;
+/
+
+BEGIN
+    dept_package.get_department_by_country('US');
+END;
+/
+
+-- SELECT
+--     *
+-- FROM
+--     locations
+set server output on 
+output 
+-- Department ID: 60, Department Name: IT,location :1400US
+-- Department ID: 50, Department Name: Shipping,location :1500US
+-- Department ID: 10, Department Name: Administration,location :1700US
+-- Department ID: 30, Department Name: Purchasing,location :1700US
+-- Department ID: 90, Department Name: Executive,location :1700US
+-- Department ID: 100, Department Name: Finance,location :1700US
+-- Department ID: 110, Department Name: Accounting,location :1700US
+-- Department ID: 120, Department Name: Treasury,location :1700US
+-- Department ID: 130, Department Name: Corporate Tax,location :1700US
+-- Department ID: 140, Department Name: Control And Credit,location :1700US
+-- Department ID: 150, Department Name: Shareholder Services,location :1700US
+-- Department ID: 160, Department Name: Benefits,location :1700US
+-- Department ID: 170, Department Name: Manufacturing,location :1700US
+-- Department ID: 180, Department Name: Construction,location :1700US
+-- Department ID: 190, Department Name: Contracting,location :1700US
+-- Department ID: 200, Department Name: Operations,location :1700US
+-- Department ID: 210, Department Name: IT Support,location :1700US
+-- Department ID: 220, Department Name: NOC,location :1700US
+-- Department ID: 230, Department Name: IT Helpdesk,location :1700US
+-- Department ID: 240, Department Name: Government Sales,location :1700US
+-- Department ID: 250, Department Name: Retail Sales,location :1700US
+-- Department ID: 260, Department Name: Recruiting,location :1700US
+-- Department ID: 270, Department Name: Payroll,location :1700US
+
+
+
