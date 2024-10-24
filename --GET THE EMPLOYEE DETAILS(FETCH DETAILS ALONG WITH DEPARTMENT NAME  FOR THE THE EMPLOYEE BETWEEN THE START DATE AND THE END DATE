@@ -1,0 +1,62 @@
+--GET THE EMPLOYEE DETAILS(FETCH DETAILS ALONG WITH DEPARTMENT NAME  FOR THE THE EMPLOYEE BETWEEN THE START DATE AND THE END DATE 
+Create or replace package XX_2319584_PKG AS
+    PROCEDURE EMP_DETAILS(
+    P_start_date date,
+    P_end_date date
+    );
+END XX_2319584_PKG;
+
+CREATE OR REPLACE PACKAGE BODY XX_2319584_PKG AS
+    
+    PROCEDURE EMP_DETAILS(P_start_date DATE, P_end_date DATE) IS
+        CURSOR emp_data IS
+            SELECT
+                e.*,
+                d.department_name
+            FROM
+                employees e
+                JOIN departments d ON e.department_id = d.department_id
+            WHERE
+                e.hire_date BETWEEN P_start_date AND P_end_date;
+
+        EMP_ROW emp_data%ROWTYPE;
+    
+    BEGIN
+        OPEN emp_data;
+        LOOP
+            FETCH emp_data INTO EMP_ROW;
+            EXIT WHEN emp_data%NOTFOUND;
+            dbms_output.put_line('Employee id ' || EMP_ROW.employee_id
+                || '|, Name ' || EMP_ROW.first_name || ' ' || EMP_ROW.last_name
+                || '|, DOJ ' || EMP_ROW.hire_date
+                || '|, Department ' || EMP_ROW.department_id || ' - ' || EMP_ROW.department_name
+                || '|, Manager ' || EMP_ROW.manager_id
+                || '|, Email ' || EMP_ROW.email
+                || '|, Phone Number ' || EMP_ROW.phone_number);
+        END LOOP;
+        CLOSE emp_data;
+    END;
+    
+END XX_2319584_PKG;
+/
+
+--  17-06-03 21-09-05
+DECLARE
+    start_date DATE := TO_DATE('17-06-2003', 'DD-MM-YYYY');
+    end_date DATE := TO_DATE('21-09-2005', 'DD-MM-YYYY');
+BEGIN
+    XX_2319584_PKG.EMP_DETAILS(start_date, end_date);
+END;
+/
+SELECT
+    *
+FROM
+    employees
+SELECT
+    e.*,
+    d.department_name
+FROM
+         employees e
+    JOIN departments d ON e.department_id = d.department_id;
+
+    17-06-03 21-09-05
