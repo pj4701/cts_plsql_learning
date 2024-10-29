@@ -1,0 +1,115 @@
+CREATE OR REPLACE PACKAGE xx_bonus_pkg AS
+    PROCEDURE calculate_bonus;
+
+END xx_bonus_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY xx_bonus_pkg AS
+
+    PROCEDURE calculate_bonus IS
+// cursor to get the fetch the value and calculate the bonus of the employee
+        CURSOR emp_cursor IS
+        SELECT
+            employee_id,
+            first_name,
+            last_name,
+            salary,
+            hire_date,
+            (
+                CASE
+                    WHEN months_between(sysdate, hire_date) / 12 > 5 THEN
+                        salary * 0.10
+                    ELSE
+                        salary * 0.05
+                END
+            )   AS bonus,
+            ( salary + (
+                CASE
+                    WHEN months_between(sysdate, hire_date) / 12 > 5 THEN
+                        salary * 0.10
+                    ELSE
+                        salary * 0.05
+                END
+            ) ) AS new_salary
+        FROM
+            employees;
+
+        emp_row emp_cursor%rowtype;
+    BEGIN
+        OPEN emp_cursor;
+        LOOP
+            FETCH emp_cursor INTO emp_row;
+            EXIT WHEN emp_cursor%notfound;
+            dbms_output.put_line('Employee ID: '
+                                 || emp_row.employee_id
+                                 || ', Name: '
+                                 || emp_row.first_name
+                                 || ' '
+                                 || emp_row.last_name
+                                 || ', Bonus: '
+                                 || emp_row.bonus
+                                 || ',new salary: '
+                                 || emp_row.new_salary);
+
+        END LOOP;
+
+        CLOSE emp_cursor;
+    EXCEPTION
+        WHEN no_data_found THEN
+            dbms_output.put_line('No data found.');
+        WHEN OTHERS THEN
+            dbms_output.put_line('An error occurred: ' || sqlerrm);
+    END calculate_bonus;
+
+END xx_bonus_pkg;
+/
+// output 
+
+set serveroutput on ;
+
+BEGIN
+    xx_bonus_pkg.calculate_bonus;
+END;
+/
+
+// checking cursor for working and ofr the output 
+SELECT
+                employee_id,
+                first_name,
+                last_name,
+                salary,
+                hire_date,
+                (CASE
+                    WHEN MONTHS_BETWEEN(SYSDATE, hire_date) / 12 > 5 THEN salary * 0.10
+                    ELSE salary * 0.05
+                END) AS bonus
+                ( salary+bonus ) as new salary
+            FROM
+employees;
+
+SELECT
+    employee_id,
+    first_name,
+    last_name,
+    salary,
+    hire_date,
+    (
+        CASE
+            WHEN months_between(sysdate, hire_date) / 12 > 5 THEN
+                salary * 0.10
+            ELSE
+                salary * 0.05
+        END
+    )   AS bonus,
+    ( salary + (
+        CASE
+            WHEN months_between(sysdate, hire_date) / 12 > 5 THEN
+                salary * 0.10
+            ELSE
+                salary * 0.05
+        END
+    ) ) AS new_salary
+FROM
+    employees;
+
+
