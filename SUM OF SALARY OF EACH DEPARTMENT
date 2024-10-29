@@ -1,0 +1,107 @@
+--SELECT
+--    salary
+--FROM
+--         departments d
+--    JOIN employees s ON d.department_id = s.department_id 
+--select * from employees
+--select * from departments 
+--
+--SELECT
+--                d.department_id,
+--                d.department_name,
+--                l.city AS location,
+--                SUM(e.salary) AS total_salary
+--            FROM
+--                departments d
+--                JOIN locations l ON d.location_id = l.location_id
+--                JOIN employees e ON d.department_id = e.department_id
+--            GROUP BY
+--                d.department_id, d.department_name, l.city;
+--SELECT department_id,SUM(salary) AS total_salary
+--FROM employees
+--WHERE department_id = 30
+--GROUP BY department_id
+--CHECKING OF THE CURSOR 
+
+-- Package Specification
+CREATE OR REPLACE PACKAGE xx_department_pkg AS
+    -- Procedure to retrieve department details and sum of salaries
+    PROCEDURE dept_salary_summary;
+
+END xx_department_pkg;
+/
+
+-- Package Body
+CREATE OR REPLACE PACKAGE BODY xx_department_pkg AS
+
+    PROCEDURE dept_salary_summary IS
+
+        CURSOR dept_data IS
+        SELECT
+            d.department_id,
+            d.department_name,
+            l.city        AS location,
+            SUM(e.salary) AS total_salary
+        FROM
+                 departments d
+            JOIN locations l ON d.location_id = l.location_id
+            JOIN employees e ON d.department_id = e.department_id
+        GROUP BY
+            d.department_id,
+            d.department_name,
+            l.city;
+
+        dept_row dept_data%rowtype;
+    BEGIN
+        OPEN dept_data;
+        LOOP
+            FETCH dept_data INTO dept_row;
+            EXIT WHEN dept_data%notfound;
+            dbms_output.put_line('Department ID: '
+                                 || dept_row.department_id
+                                 || ', Department Name: '
+                                 || dept_row.department_name
+                                 || ', Location: '
+                                 || dept_row.location
+                                 || ', Total Salary: '
+                                 || dept_row.total_salary);
+
+        END LOOP;
+
+        CLOSE dept_data;
+    EXCEPTION
+        WHEN no_data_found THEN
+            dbms_output.put_line('No data found.');
+        WHEN OTHERS THEN
+            dbms_output.put_line('An error occurred: ' || sqlerrm);
+    END dept_salary_summary;
+
+END xx_department_pkg;
+/
+
+
+
+
+
+--
+BEGIN
+    XX_DEPARTMENT_PKG.DEPT_SALARY_SUMMARY;
+END;
+/
+SET SERVEROUTPUT ON;
+
+
+
+
+Department ID: 30, Department Name: Purchasing, Location: Seattle, Total Salary: 24900
+Department ID: 50, Department Name: Shipping, Location: South San Francisco, Total Salary: 156400
+Department ID: 80, Department Name: Sales, Location: Oxford, Total Salary: 304500
+Department ID: 70, Department Name: Public Relations, Location: Munich, Total Salary: 10000
+Department ID: 110, Department Name: Accounting, Location: Seattle, Total Salary: 20308
+Department ID: 10, Department Name: Administration, Location: Seattle, Total Salary: 4400
+Department ID: 40, Department Name: Human Resources, Location: London, Total Salary: 6500
+Department ID: 90, Department Name: Executive, Location: Seattle, Total Salary: 58000
+Department ID: 100, Department Name: Finance, Location: Seattle, Total Salary: 51608
+Department ID: 60, Department Name: IT, Location: Southlake, Total Salary: 28800
+Department ID: 20, Department Name: Marketing, Location: Toronto, Total Salary: 19000
+
