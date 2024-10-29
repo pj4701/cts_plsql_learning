@@ -1,0 +1,69 @@
+SELECT
+    d.department_id,
+    d.department_name,
+    COUNT(e.employee_id) AS num_employees,
+    AVG(e.salary)        AS avg_salary,
+    round(COUNT(e.employee_id) * AVG(e.salary) * 1.2,
+          2)             AS budget
+FROM
+         departments d
+    JOIN employees e ON d.department_id = e.department_id
+GROUP BY
+    d.department_id,
+    d.department_name;
+
+CREATE OR REPLACE PACKAGE xx_budget_pkg AS
+    PROCEDURE allocate_budget;
+END xx_budget_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY xx_budget_pkg AS
+
+    PROCEDURE allocate_budget IS
+
+        CURSOR dept_cursor IS
+        SELECT
+            d.department_id,
+            d.department_name,
+            COUNT(e.employee_id) AS num_employees,
+            AVG(e.salary)        AS avg_salary,
+            round(COUNT(e.employee_id) * AVG(e.salary) * 1.2,
+                  2)             AS budget
+        FROM
+                 departments d
+            JOIN employees e ON d.department_id = e.department_id
+        GROUP BY
+            d.department_id,
+            d.department_name;
+
+        dept_row dept_cursor%rowtype;
+    BEGIN
+        OPEN dept_cursor;
+        LOOP
+            FETCH dept_cursor INTO dept_row;
+            EXIT WHEN dept_cursor%notfound;
+            dbms_output.put_line('Department ID: '
+                                 || dept_row.department_id
+                                 || ', Department Name: '
+                                 || dept_row.department_name
+                                 || ', Budget: '
+                                 || dept_row.budget);
+
+        END LOOP;
+
+        CLOSE dept_cursor;
+    EXCEPTION
+        WHEN no_data_found THEN
+            dbms_output.put_line('No data found.');
+        WHEN OTHERS THEN
+            dbms_output.put_line('An error occurred: ' || sqlerrm);
+    END allocate_budget;
+
+END xx_budget_pkg;
+/
+
+
+BEGIN
+    xx_budget_pkg.allocate_budget;
+END;
+/
