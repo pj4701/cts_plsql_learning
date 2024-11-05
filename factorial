@@ -1,0 +1,35 @@
+CREATE OR REPLACE PACKAGE MathUtils IS
+  PROCEDURE CalculateFactorial(n IN NUMBER, result OUT NUMBER);
+  FUNCTION IsPrime(n IN NUMBER) RETURN BOOLEAN;
+END MathUtils;
+/
+CREATE OR REPLACE PACKAGE BODY MathUtils IS
+  PROCEDURE CalculateFactorial(n IN NUMBER, result OUT NUMBER) IS
+factorial NUMBER := 1;
+  BEGIN
+    IF n < 0 THEN
+      RAISE_APPLICATION_ERROR(-20001, 'Factorial is not defined for negative numbers.');
+    END IF;
+    IF n > 1 THEN
+      FOR i IN 2..n LOOP
+factorial := factorial * i;
+      END LOOP;
+    END IF;
+result := factorial;
+  END CalculateFactorial;
+  FUNCTION IsPrime(n IN NUMBER) RETURN BOOLEAN IS
+divisor NUMBER := 2;
+  BEGIN
+    IF n < 2 THEN
+      RETURN FALSE;
+    END IF;
+    WHILE divisor <= SQRT(n) LOOP
+      IF n MOD divisor = 0 THEN
+        RETURN FALSE;
+      END IF;
+divisor := divisor + 1;
+    END LOOP;
+    RETURN TRUE;
+  END IsPrime;
+END MathUtils;
+/
