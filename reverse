@@ -1,0 +1,34 @@
+CREATE OR REPLACE PACKAGE StringUtils IS
+  FUNCTION ReverseString(input_string IN VARCHAR2) RETURN VARCHAR2;
+  FUNCTION SubstringCount(input_string IN VARCHAR2, substring IN VARCHAR2) RETURN NUMBER;
+END StringUtils;
+/
+CREATE OR REPLACE PACKAGE BODY StringUtils IS
+  FUNCTION ReverseString(input_string IN VARCHAR2) RETURN VARCHAR2 IS
+reversed_stringVARCHAR2(32767);
+  BEGIN
+    IF input_string IS NULL THEN
+      RETURN NULL;
+    END IF;
+    FOR i IN REVERSE 1..LENGTH(input_string) LOOP
+reversed_string := reversed_string || SUBSTR(input_string, i, 1);
+    END LOOP;
+    RETURN reversed_string;
+  END ReverseString;
+  FUNCTION SubstringCount(input_string IN VARCHAR2, substring IN VARCHAR2) RETURN NUMBER IS
+cnt NUMBER := 0;
+position NUMBER := 1;
+  BEGIN
+    IF input_string IS NULL OR substring IS NULL THEN
+      RETURN 0;
+    END IF;
+    LOOP
+position := INSTR(input_string, substring, position);
+      EXIT WHEN position = 0;
+cnt := cnt + 1;
+position := position + 1;
+    END LOOP;
+    RETURN cnt;
+  END SubstringCount;
+END StringUtils;
+/
