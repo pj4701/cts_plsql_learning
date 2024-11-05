@@ -1,0 +1,25 @@
+CREATE OR REPLACE PACKAGE employee_count_pkg AS
+  FUNCTION get_employee_count(p_job_title VARCHAR2) RETURN NUMBER;
+END employee_count_pkg;
+/
+CREATE OR REPLACE PACKAGE BODY employee_count_pkg AS
+  FUNCTION get_employee_count(p_job_title VARCHAR2) RETURN NUMBER IS
+    v_employee_count NUMBER := 0;
+  BEGIN
+    -- Select the count of employees with the given job title
+    SELECT COUNT(*)
+    INTO v_employee_count
+    FROM employees
+    WHERE job_id = p_job_title;
+    
+    RETURN v_employee_count;
+    
+  EXCEPTION
+    -- Handle specific exceptions
+    WHEN NO_DATA_FOUND THEN
+      RETURN 0; -- No employees found with the given job title
+    WHEN OTHERS THEN
+      RAISE_APPLICATION_ERROR(-20001, 'An error occurred while fetching the employee count.');
+  END get_employee_count;
+END employee_count_pkg;
+/
