@@ -1,0 +1,20 @@
+CREATE OR REPLACE PACKAGE InputValidationPackage AS
+  PROCEDURE ValidatePositiveInteger(input IN VARCHAR2);
+END InputValidationPackage;
+/
+CREATE OR REPLACE PACKAGE BODY InputValidationPackage AS
+  PROCEDURE ValidatePositiveInteger(input IN VARCHAR2) IS
+numeric_input NUMBER;
+  BEGIN
+numeric_input := TO_NUMBER(input);
+    IF numeric_input<= 0 THEN
+      RAISE_APPLICATION_ERROR(-20001, 'Input must be a positive integer.');
+    END IF;
+    EXCEPTION
+      WHEN VALUE_ERROR THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Input must be a valid number.');
+      WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20003, 'An error occurred while validating the input.');
+  END ValidatePositiveInteger;
+END InputValidationPackage;
+/
