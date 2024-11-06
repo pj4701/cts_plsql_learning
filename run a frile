@@ -1,0 +1,11 @@
+DECLARE
+  v_count NUMBER;
+  v_count2 NUMBER; -- Declare the second variable
+BEGIN
+  v_count := employee_count_pkg.get_employee_count('IT_PROG');
+  v_count2 := employee_count_pkg.get_employee_count('AD_PRES');
+  -- Replace 'IT_PROG' and 'AD_PRES' with the desired job titles
+  DBMS_OUTPUT.PUT_LINE('Employee count for IT_PROG: ' || v_count);
+  DBMS_OUTPUT.PUT_LINE('Employee count for AD_PRES: ' || v_count2);
+END;
+/
