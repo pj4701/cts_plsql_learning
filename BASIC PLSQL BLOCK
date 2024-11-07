@@ -1,0 +1,21 @@
+-- basic executing statement 
+DECLARE
+  -- variable declaration
+  V_EMPLOYEE_NAME VARCHAR2(50);
+
+-- EXECUTABLE BLOCK 
+BEGIN 
+  -- Assuming the table name is EMPLOYEES
+  SELECT FIRST_NAME || ' ' || LAST_NAME 
+  INTO V_EMPLOYEE_NAME 
+  FROM EMPLOYEES 
+  WHERE EMPLOYEE_ID = 100;-- Example condition, adjust as needed
+
+  dbms_output.put_line('EMPLOYEE_NAME: ' || V_EMPLOYEE_NAME);
+  
+EXCEPTION
+  -- HANDLES EXCEPTION
+  WHEN OTHERS THEN
+    RAISE_APPLICATION_ERROR(-20001, 'An error occurred while fetching the employee name.');
+END;
+/
